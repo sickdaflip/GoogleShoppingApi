@@ -76,7 +76,27 @@ class BlueVisionTec_GoogleShoppingApi_Helper_Price
                 return $product->getPriceModel()->getMinAmount($product);
 
             default:
-                return $product->getFinalPrice();
+                //return $product->getFinalPrice();
+                $tierPrices = array();
+                $tierInfo = $product->getTierPrice();
+                if (is_null($tierInfo)) {
+                    $attribute = $product->getResource()->getAttribute('tier_price');
+                    if ($attribute) {
+                        $attribute->getBackend()->afterLoad($product);
+                        $tierInfo = $product->getData('tier_price');
+                    }
+                }
+                foreach ($tierInfo as $tierPrice) {
+                    array_push($tierPrices, $tierPrice['price']);
+                }
+                $minTier = min($tierPrices);
+                if ($minTier == false) {
+                    $price_raw = Mage::helper('tax')->getPrice($product, $product->getFinalPrice(), true, null, null, null, 5);
+                } else {
+                    $price_raw = Mage::helper('tax')->getPrice($product, $minTier, true, null, null, null, 5);
+                }
+                $skonto = $price_raw * 97 / 100;
+                return $skonto;
         }
     }
 
