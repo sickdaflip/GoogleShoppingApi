@@ -21,7 +21,7 @@ class BlueVisionTec_GoogleShoppingApi_Model_Flag extends Mage_Core_Model_Flag
     /**
      * Flag time to live in seconds
      */
-    const FLAG_TTL = 72000;
+    const FLAG_TTL = 0;
 
     /**
      * Synchronize flag code

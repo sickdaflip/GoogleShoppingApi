@@ -15,7 +15,7 @@
  * @author      Magento Core Team <core@magentocommerce.com>
  * @author      BlueVisionTec UG (haftungsbeschränkt) <magedev@bluevisiontec.eu>
  */
-class BlueVisionTec_GoogleShoppingApi_Block_Adminhtml_Items_Product 
+class BlueVisionTec_GoogleShoppingApi_Block_Adminhtml_Items_Product
 	extends Mage_Adminhtml_Block_Widget_Grid
 {
 	public function __construct()
@@ -53,7 +53,8 @@ class BlueVisionTec_GoogleShoppingApi_Block_Adminhtml_Items_Product
 			->addAttributeToSelect('sku')
 			->addAttributeToSelect('price')
 			->addAttributeToSelect('status')
-			->addAttributeToSelect('attribute_set_id');
+			->addAttributeToSelect('attribute_set_id')
+            ->addFieldToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH);
 
 		$store = $this->_getStore();
 		if ($store->getId()) {
@@ -125,6 +126,13 @@ class BlueVisionTec_GoogleShoppingApi_Block_Adminhtml_Items_Product
 			'rate'      => $this->_getStore()->getBaseCurrency()->getRate($this->_getStore()->getDefaultCurrencyCode()),
 			'index'     => 'price'
 		));
+        $this->addColumn('visibility', array(
+            'header' => Mage::helper('catalog')->__('Visibility'),
+            'width' => '70px',
+            'index' => 'visibility',
+            'type' => 'options',
+            'options' => Mage::getModel('catalog/product_visibility')->getOptionArray(),
+        ));
 		$this->addColumn('status', array(
 			'header'    => Mage::helper('sales')->__('Status'),
 			'width'     => '80px',
