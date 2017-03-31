@@ -396,17 +396,14 @@
                 <sale_price translate="name">
                     <name>Sale Price</name>
                     <required>0</required>
-                    <country>US</country>
                 </sale_price>
                 <sale_price_effective_date_from translate="name">
                     <name>Sale Price Effective From Date</name>
                     <required>0</required>
-                    <country>US</country>
                 </sale_price_effective_date_from>
                 <sale_price_effective_date_to translate="name">
                     <name>Sale Price Effective To Date</name>
                     <required>0</required>
-                    <country>US</country>
                 </sale_price_effective_date_to>
                 <age_group translate="name">
                     <name>Age Group</name>
@@ -472,6 +469,10 @@
                     <name>Energy Efficiency Class</name>
                     <required>0</required>
                 </energy_efficiency_class>
+                <promotion_id translate="name">
+                    <name>Promotion ID</name>
+                    <required>0</required>
+                </promotion_id>
             </ProductSearch>
             <ProductAds>
                 <adwords_grouping translate="name">

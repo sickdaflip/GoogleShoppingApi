@@ -20,7 +20,7 @@ class BlueVisionTec_GoogleShoppingApi_Model_Attribute_Price extends BlueVisionTe
     /**
      * Set current attribute to entry (for specified product)
      *
-      * @param Mage_Catalog_Model_Product $product
+     * @param Mage_Catalog_Model_Product $product
      * @param Google_Service_ShoppingContent_Product $shoppingProduct
      * @return Google_Service_ShoppingContent_Product
      */
@@ -33,7 +33,7 @@ class BlueVisionTec_GoogleShoppingApi_Model_Attribute_Price extends BlueVisionTe
 
         $store = Mage::app()->getStore($product->getStoreId());
         $targetCountry = Mage::getSingleton('googleshoppingapi/config')->getTargetCountry($product->getStoreId());
-        $isSalePriceAllowed = true;//($targetCountry == 'US');
+        $isSalePriceAllowed = false;//($targetCountry == 'US');
 
         // get tax settings
         $taxHelp = Mage::helper('tax');
@@ -42,7 +42,7 @@ class BlueVisionTec_GoogleShoppingApi_Model_Attribute_Price extends BlueVisionTe
             $priceDisplayType == Mage_Tax_Model_Config::DISPLAY_TYPE_INCLUDING_TAX
             || $priceDisplayType == Mage_Tax_Model_Config::DISPLAY_TYPE_BOTH
         );
-        
+
 
         // calculate sale_price attribute value
         $salePriceAttribute = $this->getGroupAttributeSalePrice();
@@ -53,13 +53,13 @@ class BlueVisionTec_GoogleShoppingApi_Model_Attribute_Price extends BlueVisionTe
         }
         if (!is_null($salePriceMapValue) && floatval($salePriceMapValue) > .0001) {
             $finalPrice = $salePriceMapValue;
-        
+
         } else if ($isSalePriceAllowed) {
             $finalPrice = Mage::helper('googleshoppingapi/price')->getCatalogPrice($product, $store, $inclTax);
         }
-        
-        
-        
+
+
+
         if ($product->getTypeId() != Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
             $finalPrice = $taxHelp->getPrice($product, $finalPrice, $inclTax, null, null, null, $product->getStoreId());
         }
@@ -78,23 +78,23 @@ class BlueVisionTec_GoogleShoppingApi_Model_Attribute_Price extends BlueVisionTe
         if ($product->getTypeId() != Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
             $price = $taxHelp->getPrice($product, $price, $inclTax, null, null, null, $product->getStoreId());
         }
-        
-		$shoppingPrice = new Google_Service_ShoppingContent_Price();
-		$shoppingPrice->setCurrency($store->getDefaultCurrencyCode());//sprintf('%.2f', $store->roundPrice($price))
+
+        $shoppingPrice = new Google_Service_ShoppingContent_Price();
+        $shoppingPrice->setCurrency($store->getDefaultCurrencyCode());//sprintf('%.2f', $store->roundPrice($price))
         if ($isSalePriceAllowed) {
             // set sale_price and effective dates for it
             if ($price && ($price - $finalPrice) > .0001) {
-				$salesPrice = new Google_Service_ShoppingContent_Price();
-				$salesPrice->setCurrency($store->getDefaultCurrencyCode());
+                $salesPrice = new Google_Service_ShoppingContent_Price();
+                $salesPrice->setCurrency($store->getDefaultCurrencyCode());
                 $shoppingPrice->setValue(sprintf('%.2f', $store->roundPrice($price)));
                 $salesPrice->setValue($finalPrice);
-				$shoppingProduct->setSalePrice($salesPrice);
-				
+                $shoppingProduct->setSalePrice($salesPrice);
+
                 $effectiveDate = $this->getGroupAttributeSalePriceEffectiveDate();
                 if (!is_null($effectiveDate)) {
                     $effectiveDate->setGroupAttributeSalePriceEffectiveDateFrom(
-                            $this->getGroupAttributeSalePriceEffectiveDateFrom()
-                        )
+                        $this->getGroupAttributeSalePriceEffectiveDateFrom()
+                    )
                         ->setGroupAttributeSalePriceEffectiveDateTo($this->getGroupAttributeSalePriceEffectiveDateTo())
                         ->convertAttribute($product, $shoppingProduct);
                 }
@@ -105,16 +105,17 @@ class BlueVisionTec_GoogleShoppingApi_Model_Attribute_Price extends BlueVisionTe
             //TODO
             // 2011-03-01T13:00-0800/2011-03-11T15:30-0800
             // salePriceEffectiveDate
-            
+
             // calculate taxes
             $tax = $this->getGroupAttributeTax();
             if (!$inclTax && !is_null($tax)) {
                 $tax->convertAttribute($product, $shoppingProduct);
             }
         } else {
-            $shoppingPrice->setValue(sprintf('%.2f', $store->roundPrice($price)));
+            $price1 = Mage::helper('googleshoppingapi/price')->getCatalogPrice($product, $store, $inclTax);
+            $shoppingPrice->setValue(sprintf('%.2f', $store->roundPrice($price1)));
         }
-        
+
         $shoppingProduct->setPrice($shoppingPrice);
 
         return $shoppingProduct;
